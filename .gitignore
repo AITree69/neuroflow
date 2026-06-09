@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg
+.eggs/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# C++ build
+cpp/build/
+cpp/cmake-build-*/
+*.o
+*.a
+*.obj
+*.pdb
+*.exp
+*.lib
+*.pyd
+*.dll
+
+# Artifacts
+artifacts/
+
+# Release archives (use GitHub Releases instead)
+*.zip
+*.tar.gz
+*.tgz
+
+# LaTeX intermediate files
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/build/
+
+# Editor / agent metadata
+.opencode/
+.vscode/
+.idea/
+
+# Commit-message scratchpads (transient; never commit these)
+_commit_msg.txt
+COMMIT_EDITMSG.tmp
+
+# OS
+.DS_Store
+Thumbs.db

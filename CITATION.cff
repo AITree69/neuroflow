@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+message: |
+  If you use NeuroFlow in academic work, please cite both the
+  software and the Stage 1 MVP paper. The DOI below is the
+  software DOI (assigned by Zenodo on first tagged release);
+  the paper DOI is the arXiv ID once uploaded.
+title: "NeuroFlow"
+abstract: |
+  NeuroFlow is an industrial-grade neural operator framework for
+  PDE-centric scientific computing. It pairs a PyTorch research
+  layer with a zero-dependency C++ runtime and an optional
+  pybind11 binding, exposed through a versioned intermediate
+  representation (NeuroIR) so trained operators can be deployed
+  inside HPC/CFD pipelines.
+authors:
+  - family-names: NeuroFlow Contributors
+    name-particle: ""
+    given-names: ""
+    affiliation: "NeuroFlow Project"
+    orcid: ""
+keywords:
+  - neural-operators
+  - fourier-neural-operator
+  - scientific-computing
+  - pde-surrogate
+  - cfd
+  - hpc
+license: Apache-2.0
+license-url: https://www.apache.org/licenses/LICENSE-2.0
+repository-code: "https://github.com/neuroflow/neuroflow"
+url: "https://github.com/neuroflow/neuroflow"
+type: software
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.placeholder
+    description: "Zenodo DOI — replaced on first tagged release."
+date-released: 2026-06-03
+version: 0.1.0
+preferred-citation:
+  type: article
+  title: "NeuroFlow: An Industrial-Grade Neural Operator Framework for PDE-Centric Scientific Computing (Stage 1 MVP)"
+  authors:
+    - family-names: NeuroFlow Contributors
+  journal: "arXiv preprint"
+  year: 2026
+  archive: "arXiv"
+  # Replace with the real arXiv ID once the paper is uploaded.
+  identifier: "arXiv:placeholder"

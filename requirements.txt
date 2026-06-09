@@ -1,0 +1,6 @@
+numpy>=1.23
+torch>=2.0
+matplotlib>=3.5
+pybind11>=2.11
+pytest>=7.0
+hypothesis>=6.0

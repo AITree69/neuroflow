@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "pybind11>=2.11"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neuroflow"
+version = "0.1.0"
+description = "Industrial-grade Neural Operator framework for PDE-centric scientific computing"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "NeuroFlow Contributors"}
+]
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "numpy>=1.23",
+    "torch>=2.0",
+    "matplotlib>=3.5",
+]
+
+[project.optional-dependencies]
+cpp = ["pybind11>=2.11"]
+dev = [
+    "pytest>=7.0",
+    "hypothesis>=6.0",
+    "ruff>=0.1",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/neuroflow/neuroflow"
+Repository = "https://github.com/neuroflow/neuroflow.git"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["neuroflow*"]
+
+[tool.setuptools.package-data]
+neuroflow = ["py.typed"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+ignore_missing_imports = true

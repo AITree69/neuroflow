@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel in-progress runs on the same ref to save minutes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: pytest (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # CPU-only torch keeps CI cheap; GPU not required for unit tests.
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch
+          python -m pip install -r requirements.txt
+          python -m pip install pytest hypothesis ruff
+
+      - name: Lint (ruff)
+        run: ruff check neuroflow tests examples
+
+      - name: Run unit tests
+        run: pytest tests/ -v --tb=short
+
+  build-cpp:
+    name: C++ smoke build (ubuntu, MinGW-equivalent)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ python3-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configure
+        working-directory: cpp
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build runtime + tests (no pybind11)
+        working-directory: cpp
+        run: cmake --build build --target nflow_core test_runtime --config Release
+
+      - name: Run C++ test binary
+        working-directory: cpp
+        run: ./build/test_runtime
