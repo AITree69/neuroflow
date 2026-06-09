@@ -63,6 +63,13 @@ paper/build/
 _commit_msg.txt
 COMMIT_EDITMSG.tmp
 
+# Local backup of pre-cleanup git history (e.g. .git.old.2026-06-09/).
+# The repo currently has a single initial commit and no history; the
+# old `.git/` was preserved as a sibling directory for rollback only.
+.git.old.*/
+.git.bak/
+.git.previous*/
+
 # OS
 .DS_Store
 Thumbs.db
