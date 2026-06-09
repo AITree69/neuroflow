@@ -106,6 +106,13 @@ if(NFLOW_BUILD_TESTS)
   add_executable(test_runtime tests/test_runtime.cpp)
   target_link_libraries(test_runtime PRIVATE nflow_core)
   add_test(NAME test_runtime COMMAND test_runtime)
+
+  # Sprint 3.30: FP8 E4M3 (IEEE-754 binary8) bit-level conversions
+  # + per-tensor fake-quant.  Header-only, so no new sources to
+  # add to nflow_core — just an extra test binary.
+  add_executable(test_fp8_e4m3 tests/test_fp8_e4m3.cpp)
+  target_link_libraries(test_fp8_e4m3 PRIVATE nflow_core)
+  add_test(NAME test_fp8_e4m3 COMMAND test_fp8_e4m3)
 endif()
 
 # ----------------------------------------------------------------------------

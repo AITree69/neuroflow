@@ -24,6 +24,10 @@
 #include "neuroflow/npy_io.h"
 #include "neuroflow/runtime.h"
 #include "neuroflow/tensor.h"
+#include "neuroflow/fp8_e4m3.h"
+#define NFLOW_HAS_PYBIND11
+#define NFLOW_PYBIND_FORWARD_FP8
+#include "neuroflow/fp8_e4m3_pybind.h"
 
 namespace py = pybind11;
 
@@ -226,4 +230,9 @@ PYBIND11_MODULE(neuroflow_cpp, m) {
           },
           py::arg("model_path"), py::arg("u"), py::arg("y"),
           "Run DeepONet inference in-memory: load .nneuroir, take u + y numpy arrays, return output array");
+
+    // Sprint 3.30: FP8 E4M3 IEEE-754 bit-level conversions exposed
+    // to Python so the cross-language parity test can verify C++
+    // vs Python agreement on FP8 quantise/dequantise.
+    nflow::RegisterFp8E4M3Bindings(m);
 }

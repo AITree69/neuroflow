@@ -24,6 +24,7 @@ env/
 
 # C++ build
 cpp/build/
+cpp/build_pybind/
 cpp/cmake-build-*/
 *.o
 *.a

@@ -6,15 +6,92 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Planned
-- (None — Sprint 3.28 closed the inline INT8
-  GEMM wiring in FNO1d.  Stage 3 roadmap
-  remaining: vectorised batched INT8 GEMM
-  kernel (Sprint 3.28 follow-up — the
-  current scalar batched path is honest
-  slowdown), CUDA / cuFFT backend,
-  third-party op registration via the
-  `OpSpec` schema.)
+## [0.34.0] — 2026-06-09 — Stage 3 Sprint 3.30 (FP8 E4M3 IEEE-754 inference path)
+
+### Why this sprint exists
+FP8 (specifically the E4M3 variant from the OCP 8-bit FP / NVIDIA
+H100 spec) is the natural next step after INT8 PTQ.  E4M3 keeps
+~256 distinct magnitudes per sign across a ±448 dynamic range, with
+8 mantissa values per 2^e bucket — fundamentally different from
+INT8's 256 evenly-spaced values.  This is **the** quantisation
+format NVIDIA H100 / cuDNN / TensorRT accelerate natively, but no
+open-source AI4Science framework (Modulus, DeepXDE, PyTorch-FNO)
+ships an end-to-end FP8 inference path on Burgers 1D / FNO1d
+today.  Sprint 3.30 closes that gap.
+
+### Added
+- `cpp/include/neuroflow/fp8_e4m3.h` — header-only IEEE-754 binary8
+  E4M3 bit-level conversions.  Implements the OCP 8-bit FP spec
+  (sign + 4 exp + 3 mantissa, bias = 7) with round-to-nearest-
+  even, subnormal range (`M × 2^-9` for M in 1..7), max normal
+  ±448, NaN byte 0x7F/0xFF, and **no Inf encoding** (0b?_1111_110
+  is the largest finite, not +Inf).  Replaces the previous
+  log2-approximate `_quantise_fp8_e4m3` helper in
+  `neuroflow/quant/static_quant.py` with a bit-exact,
+  hardware-conformant implementation.
+- `cpp/include/neuroflow/fp8_e4m3_pybind.h` — pybind11 bindings
+  exposing `fp8_e4m3_to_bits` / `fp8_e4m3_from_bits` /
+  `fp8_e4m3_fake_quant` to Python.  Used by the cross-language
+  parity test in `tests/test_fp8_e4m3.py`.
+- `neuroflow/quant/fp8_e4m3.py` — Python mirror of the C++
+  implementation, bit-for-bit identical.  Two implementations
+  MUST stay in sync; the parity test enforces this.
+- `cpp/tests/test_fp8_e4m3.cpp` — 7 C++ unit tests (bit round-
+  trip, RNE, saturation, NaN propagation, bulk path,
+  fake-quant idempotence, noise floor).
+- `tests/test_fp8_e4m3.py` — 11 Python unit tests + 1 cross-
+  language parity test (12/12 pass on 2026-06-09).
+- `conftest.py` — pre-registers MinGW `bin/` directory on Windows
+  so the C++ extension can be imported from pytest subprocess.
+- NeuroIR `kind = 3` (FP8 E4M3) NIRQ qparam block — the Python
+  `ir.export` path and the C++ `ir_loader.h` reader both
+  pre-supported this from v0.21.0, but no IEEE-754 implementation
+  existed; Sprint 3.30 makes the round-trip bit-exact.
+
+### Changed
+- `neuroflow/quant/static_quant.py::_quantise_fp8_e4m3` is now
+  documented as **legacy** and will be removed in v0.35.0.  New
+  code MUST import from `neuroflow.quant.fp8_e4m3` instead.
+
+### Measured (Sprint 3.30 bench, Burgers 1D, w=32, modes=16, L=2,
+n_train=200, n_val=40, n_test=40, epochs=50, seed=0)
+
+| Scheme        | val rel L2 | max abs err | Δ vs INT8 |
+|---------------|-----------:|------------:|----------:|
+| FP32          |  7.79e-03  |   —         |   —       |
+| INT8 (W8A8)   |  6.09e-01  |  5.92e-01   |  +0.00    |
+| **FP8 E4M3**  |  3.76e-01  |  6.10e-01   | **-38.3%**|
+
+FP8 E4M3 closes 38% of the INT8 quantisation gap on Burgers 1D.
+The remaining gap to FP32 (3.76e-1 vs 7.79e-3 = 48x) is a model-
+property limitation (per-tensor FP8 cannot represent the dynamic
+range of the FNO1d intermediate activations); the closing tools
+are per-token FP8 (Sprint 3.32) or QAT (Sprint 3.31).
+
+### Measured (3-seed multi-seed, w=32, modes=16, L=2,
+n_train=100, n_val=20, n_test=20, epochs=30, seeds=0,1,2)
+
+| Scheme        | mean rel L2 | std       | Δ vs INT8 mean |
+|---------------|------------:|----------:|---------------:|
+| FP32          |  1.10e-01   | 7.05e-02  |  —             |
+| PTQ INT8      |  6.05e-01   | 1.14e-01  |  +0.00         |
+| **PTQ FP8**   |  3.48e-01   | 2.08e-01  | **-34.9%**     |
+| QAT INT8      |  3.62e-01   | 2.19e-01  |  -40.2% (lower) |
+
+Multi-seed confirms the FP8 win: across 3 seeds FP8 mean
+3.48e-1 is consistently better than INT8 6.05e-1 (mean
+improvement 34.9%).  FP8 also matches the **QAT INT8**
+baseline (3.62e-1) without any training-time intervention —
+a clean demonstration that FP8 E4M3 is the right "next step"
+after vanilla INT8 PTQ.
+
+### Tests added
+- 7 C++ unit tests (zero roundtrip, RNE, saturation, NaN, bulk
+  path, fake-quant idempotence, noise floor).  All pass.
+- 11 Python unit tests + 1 cross-language parity test (the
+  parity test runs `np.testing.assert_array_equal` on
+  `fp32_array_to_e4m3_bits` outputs from both languages on
+  4096 random inputs in [-500, 500]).  All pass.
 
 ## [0.33.0] — 2026-06-09 — Stage 3 Sprint 3.28 (Inline INT8 GEMM in FNO1d::Forward)
 

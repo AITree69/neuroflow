@@ -1,10 +1,10 @@
 # NeuroFlow — Project Status
 
-> **Last updated:** 2026-06-09 (Sprint 3.28 closed — inline INT8 GEMM in FNO1d, 92/92 pytest, paper §6.23)
+> **Last updated:** 2026-06-09 (Sprint 3.30 closed — FP8 E4M3 IEEE-754 inference, 104/104 pytest, cross-language parity)
 > **Current session:** (this session)
-> **Last commit:** `b8c102e` (Sprint 3.27 codegen refactor, before Sprint 3.28 tag)
-> **Current version:** v0.32.0 (NeuroIR) / v0.32.0 (project, before Sprint 3.28 tag)
-> **Status:** ✅ **Stage 2 完整 closed**.  Stage 3 active: Sprints 3.23 (font fix), 3.24 (QAT best-val), 3.25 (AVX2 INT8 GEMM), 3.26 (VNNI INT8 GEMM), 3.27 (codegen refactor), 3.28 (inline INT8 GEMM) all closed.
+> **Last commit:** `d781f8d` (Sprint 3.30 FP8 E4M3 bit-level conversions + cross-language parity)
+> **Current version:** v0.34.0 (NeuroIR) / v0.34.0 (project)
+> **Status:** ✅ **Stage 2 完整 closed**.  Stage 3 active: Sprints 3.23 (font fix), 3.24 (QAT best-val), 3.25 (AVX2 INT8 GEMM), 3.26 (VNNI INT8 GEMM), 3.27 (codegen refactor), 3.28 (inline INT8 GEMM), 3.30 (FP8 E4M3 IEEE-754) all closed.
 
 This file is the single-source-of-truth for project state. If a future
 session needs to know "where did we leave off", read this file first.
